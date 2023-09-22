@@ -37,24 +37,28 @@ async function addMustacheToImage(imageData) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     const mustacheImage = new Image();
-    mustacheImage.src = 'mustache.png'; // Replace 'mustache.png' with your mustache image file path
+    mustacheImage.src = 'https://www.freepnglogos.com/uploads/mustache-png/mustache-template-photo-booth-signs-and-templates-33.png'; // New mustache image URL
 
     if (pose.keypoints[0].score > 0.5) {
         const noseX = pose.keypoints[0].position.x;
         const noseY = pose.keypoints[0].position.y;
 
         // Calculate the position and size of the mustache (under the nose)
-        const mustacheWidth = 2 * pose.keypoints[0].position.x;
+        const mustacheWidth = 1.5 * pose.keypoints[0].position.x;
         const mustacheHeight = mustacheImage.height * (mustacheWidth / mustacheImage.width);
+
+        // Adjust the position of the mustache to be centered under the nose
+        const mustacheX = noseX - mustacheWidth / 2;
+        const mustacheY = noseY - mustacheHeight / 2 + 10; // Adjust the vertical position as needed
 
         // Draw the captured image
         context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 
-        // Draw the mustache image under the nose
+        // Draw the new mustache image under the nose
         context.drawImage(
             mustacheImage,
-            noseX - mustacheWidth / 2,
-            noseY - mustacheHeight / 2,
+            mustacheX,
+            mustacheY,
             mustacheWidth,
             mustacheHeight
         );
