@@ -1,17 +1,5 @@
 // Define a function to start facial detection
 async function startFaceDetection() {
-    // Access the startbutton element using document.getElementById
-    const startbutton = document.getElementById('startbutton');
-
-    // Check if the startbutton element exists
-    if (startbutton) {
-        startbutton.addEventListener('click', () => {
-            // Your code to handle the button click event goes here
-        });
-    } else {
-        console.error('startbutton element not found');
-    }
-
     const video = document.getElementById('video');
     const canvas = document.getElementById('output');
 
@@ -41,11 +29,13 @@ async function startFaceDetection() {
 // Define a function to setup PoseNet
 async function setupPoseNet() {
     // Your PoseNet setup code goes here.
+    // You should load the PoseNet model and configure it.
 }
 
 // Define a function to draw a mustache based on facial landmarks
 function drawMustache(faceLandmarks) {
     // Your code to draw a mustache on the canvas using the facial landmarks goes here.
+    // This part requires integrating a computer vision library for drawing a mustache.
 }
 
 // Call the startFaceDetection function to start the process when the page loads
