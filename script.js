@@ -3,6 +3,10 @@ const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const startButton = document.getElementById('startButton');
 
+// Load the mustache image
+const mustacheImage = new Image();
+mustacheImage.src = 'https://pngimg.com/d/moustache_PNG18.png'; // Mustache image URL
+
 // Check for camera access and start streaming
 async function startCamera() {
     try {
@@ -23,8 +27,24 @@ function captureImage() {
 
 // Function to add a mustache to the captured image
 function addMustacheToImage(imageData) {
-    // You would implement the mustache addition logic here
-    // This logic would depend on the specific requirements and libraries you use for face detection and image manipulation
+    const context = canvas.getContext('2d');
+    
+    // Clear the canvas
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the captured image
+    const capturedImage = new Image();
+    capturedImage.src = imageData;
+    context.drawImage(capturedImage, 0, 0, canvas.width, canvas.height);
+
+    // Calculate the position and size of the mustache (under the nose)
+    const mustacheX = canvas.width / 2 - mustacheImage.width / 2;
+    const mustacheY = canvas.height / 2 + canvas.height / 5;
+    const mustacheWidth = mustacheImage.width;
+    const mustacheHeight = mustacheImage.height;
+
+    // Draw the mustache image onto the captured image
+    context.drawImage(mustacheImage, mustacheX, mustacheY, mustacheWidth, mustacheHeight);
 }
 
 // Event listener for the Start button
