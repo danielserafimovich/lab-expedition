@@ -2,10 +2,7 @@
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const startButton = document.getElementById('startButton');
-
-// Load the mustache image
-const mustacheImage = new Image();
-mustacheImage.src = 'https://pngimg.com/d/moustache_PNG18.png'; // Mustache image URL
+let net;
 
 // Check for camera access and start streaming
 async function startCamera() {
@@ -25,39 +22,51 @@ function captureImage() {
     return canvas.toDataURL('image/jpeg');
 }
 
-// Function to add a mustache to the captured image
-function addMustacheToImage(imageData) {
-    const context = canvas.getContext('2d');
-    
-    // Clear the canvas
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the captured image
-    const capturedImage = new Image();
-    capturedImage.src = imageData;
-    context.drawImage(capturedImage, 0, 0, canvas.width, canvas.height);
-
-    // Calculate the position and size of the mustache (under the nose)
-    const mustacheX = canvas.width / 2 - mustacheImage.width / 2;
-    const mustacheY = canvas.height / 2 + canvas.height / 5;
-    const mustacheWidth = mustacheImage.width;
-    const mustacheHeight = mustacheImage.height;
-
-    // Draw the mustache image onto the captured image
-    context.drawImage(mustacheImage, mustacheX, mustacheY, mustacheWidth, mustacheHeight);
+// Load PoseNet model and estimate poses
+async function loadPoseNet() {
+    net = await posenet.load();
 }
 
-// Event listener for the Start button
-startButton.addEventListener('click', () => {
-    startCamera();
-    startButton.disabled = true;
-});
+// Function to add a mustache to the captured image
+async function addMustacheToImage(imageData) {
+    const imageElement = document.createElement('img');
+    imageElement.src = imageData;
+
+    const pose = await net.estimateSinglePose(imageElement);
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    const mustacheImage = new Image();
+    mustacheImage.src = 'mustache.png'; // Replace 'mustache.png' with your mustache image file path
+
+    if (pose.keypoints[0].score > 0.5) {
+        const noseX = pose.keypoints[0].position.x;
+        const noseY = pose.keypoints[0].position.y;
+
+        // Calculate the position and size of the mustache (under the nose)
+        const mustacheWidth = 2 * pose.keypoints[0].position.x;
+        const mustacheHeight = mustacheImage.height * (mustacheWidth / mustacheImage.width);
+
+        // Draw the captured image
+        context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+
+        // Draw the mustache image under the nose
+        context.drawImage(
+            mustacheImage,
+            noseX - mustacheWidth / 2,
+            noseY - mustacheHeight / 2,
+            mustacheWidth,
+            mustacheHeight
+        );
+    }
+}
+
+// Initialize the camera and PoseNet on page load (automatic start)
+startCamera();
+loadPoseNet();
 
 // Event listener to capture an image and add a mustache
 video.addEventListener('click', () => {
     const imageData = captureImage();
     addMustacheToImage(imageData);
 });
-
-// Initialize the camera on page load
-startCamera();
